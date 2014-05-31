@@ -258,6 +258,9 @@ class WP_Object_Cache {
 		else
 			$prefix = $this->blog_prefix;
 
+        if ( defined( 'ICL_LANGUAGE_CODE' ) )
+            $prefix .= ICL_LANGUAGE_CODE . ':';
+        
 		return WP_APC_KEY_SALT . ':' . $this->abspath . ":$prefix$group:$key";
 	}
 
