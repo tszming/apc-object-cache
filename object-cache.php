@@ -14,7 +14,7 @@ http://wordpress.org/extend/plugins/memcached/
 
 */
 
-if ( function_exists( 'apc_fetch' ) ) :
+if ( function_exists( 'apc_fetch' ) && ! ( PHP_SAPI == 'cli' && ini_get( 'apc.enable_cli' ) == '0' ) ) :
 
 if ( version_compare( '5.2.4', phpversion(), '>=' ) ) {
 	wp_die( 'The APC object cache backend requires PHP 5.2 or higher. You are running ' . phpversion() . '. Please remove the <code>object-cache.php</code> file from your content directory.' );
@@ -375,11 +375,5 @@ if ( function_exists( 'apc_inc' ) ) {
 } // !function_exists( 'wp_cache_add' )
 
 else : // No APC
-	function apc_not_actually_running() {
-		$GLOBALS['_wp_using_ext_object_cache'] = false;
-		unset( $GLOBALS['wp_filter']['all'][-100]['apc_not_actually_running'] );
-	}
-	$GLOBALS['_wp_using_ext_object_cache'] = false; // This will get overridden as of WP 3.5, so we have to hook in to 'all':
-	$GLOBALS['wp_filter']['all'][-100]['apc_not_actually_running'] = array( 'function' => 'apc_not_actually_running', 'accepted_args' => 0 );
-	require_once ( ABSPATH . WPINC . '/cache.php' );
+	wp_using_ext_object_cache( false );
 endif;
